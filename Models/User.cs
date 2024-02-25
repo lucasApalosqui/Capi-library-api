@@ -11,6 +11,8 @@
         public Role Role { get; set; }
         public Address Address { get; set; }
 
+        public Rental? Rental { get; set; }
+
         public IList<Phone> Phones { get; set; }
     }
 }

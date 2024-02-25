@@ -8,6 +8,7 @@
         public int Pages { get; set; }
         public string GeneralAud {  get; set; }
 
+        public Rental? Rental { get; set; }
         public IList<Writer> Writers { get; set; }
         public IList<Category> Categories { get; set; }
     }

@@ -8,6 +8,8 @@
         public string State { get; set; }
         public int Number { get; set; }
         public string Complement { get; set; }
+        public User User { get; set; }
+        public int UserId { get; set; }
 
 
     }
