@@ -1,4 +1,6 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.Models;
+using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Roles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +15,23 @@ namespace Capi_Library_Api.Controllers
         public async Task<IActionResult> GetAllRolesAsync([FromServices] DataContext context)
         {
             List<GetAllRolesViewModel> rolesV = new List<GetAllRolesViewModel>();
-            
-            var roles = await context.Roles.ToListAsync();
-            foreach (var role in roles)
+            try
             {
-                GetAllRolesViewModel roleView = new GetAllRolesViewModel();
-                roleView.Id = role.Id;
-                roleView.Name = role.Name;
-                rolesV.Add(roleView);
+                var roles = await context.Roles.ToListAsync();
+                foreach (var role in roles)
+                {
+                    GetAllRolesViewModel roleView = new GetAllRolesViewModel();
+                    roleView.Id = role.Id;
+                    roleView.Name = role.Name;
+                    rolesV.Add(roleView);
+                }
+                return Ok(new ResultViewModel<List<GetAllRolesViewModel>>(rolesV));
+
+            } catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<GetAllRolesViewModel>("08T56 - Role não encontrada"));
             }
-            return Ok(rolesV);
+            
         }
     }
 }
