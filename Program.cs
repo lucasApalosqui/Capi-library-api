@@ -1,4 +1,6 @@
+using Capi_Library_Api;
 using Capi_Library_Api.Data;
+using Capi_Library_Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +17,9 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {
