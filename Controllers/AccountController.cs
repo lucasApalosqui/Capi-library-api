@@ -1,5 +1,6 @@
 ﻿using Capi_Library_Api.Data;
 using Capi_Library_Api.Models;
+using Capi_Library_Api.Services;
 using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Accounts;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,36 @@ namespace Capi_Library_Api.Controllers
             }catch (Exception ex)
             {
                 return StatusCode(404, new ResultViewModel<string>(ex.ToString()));
+            }
+        }
+
+        [HttpPost("v1/accounts/login")]
+        public async Task<IActionResult> Post([FromBody] LoginViewModel model, [FromServices] DataContext context, [FromServices] TokenService tokenService)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var user = await context.Users
+                .AsNoTracking()
+                .Include(x => x.Role)
+                .FirstOrDefaultAsync(x => x.Email == model.Email);
+
+            if (user == null)
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
+
+            if (!PasswordHasher.Verify(user.PasswordHash, model.Password))
+                return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
+
+            try
+            {
+                var token = tokenService.GenerateToken(user);
+                return Ok(new ResultViewModel<string>(token, null));
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode(404);
             }
         }
     }
