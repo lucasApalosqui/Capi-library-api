@@ -4,6 +4,7 @@ using Capi_Library_Api.Services;
 using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Accounts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SecureIdentity.Password;
 
@@ -12,6 +13,7 @@ namespace Capi_Library_Api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        [AllowAnonymous]
         [HttpPost("v1/accounts/register")]
         public async Task<IActionResult> Post([FromBody] RegisterAccountViewModel model, [FromServices] DataContext context)
         {
@@ -51,6 +53,7 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("v1/accounts/login")]
         public async Task<IActionResult> Post([FromBody] LoginViewModel model, [FromServices] DataContext context, [FromServices] TokenService tokenService)
         {
