@@ -2,6 +2,6 @@
 {
     public static class Configuration
     {
-            public static string JwtKey { get; set; } = "ZGFmNDQyOGYtNjJhOS00YmYxLWEyMWYtMzA2OGZiOTNhYWM2=";
+            public static string JwtKey { get; set; } = "ZGFmNDQyOGYtNjJhOS00YmYxLWEyMWYtMzA2OGZOTNhYWM2=";
     }
 }

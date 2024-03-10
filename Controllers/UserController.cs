@@ -1,15 +1,19 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.Models;
 using Capi_Library_Api.Services;
 using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Capi_Library_Api.Controllers
 {
+    
     [ApiController]
     public class UserController : ControllerBase
     {
+        [Authorize (Roles = "Admin")]
         [HttpGet("v1/users")]
         public async Task<IActionResult> GetAllUsers([FromServices] DataContext context)
         {
