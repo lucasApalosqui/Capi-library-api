@@ -11,6 +11,7 @@ namespace Capi_Library_Api.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
+        [Authorize(Roles = "Admin")]
         [HttpGet("v1/roles")]
         public async Task<IActionResult> GetAllRolesAsync([FromServices] DataContext context)
         {

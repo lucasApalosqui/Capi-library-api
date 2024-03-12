@@ -10,11 +10,11 @@ using System.Security.Claims;
 
 namespace Capi_Library_Api.Controllers
 {
-    
+
     [ApiController]
     public class UserController : ControllerBase
     {
-        [Authorize (Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("v1/users")]
         public async Task<IActionResult> GetAllUsers([FromServices] DataContext context)
         {
@@ -35,7 +35,8 @@ namespace Capi_Library_Api.Controllers
                     .ToListAsync();
 
                 return Ok(new ResultViewModel<List<GetAllUserViewModel>>(users));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return NotFound(new ResultViewModel<GetAllUserViewModel>("87650 - Usuarios Não encontrados"));
             }
@@ -56,31 +57,82 @@ namespace Capi_Library_Api.Controllers
                     .FirstOrDefaultAsync(x => x.Email == email);
 
                 IList<string> phoneS = new List<string>();
-                foreach(var phone in user.Phones)
+                foreach (var phone in user.Phones)
                 {
                     phoneS.Add(phone.PhoneNumber);
                 }
-                var userAll = new GetUserProfileViewModel
+
+                if(user.Address != null && user.Phones != null)
                 {
-                    Name = user.Name,
-                    Email = user.Email,
-                    Cpf = user.Cpf,
-                    street = user.Address.Street,
-                    Disctrict = user.Address.Disctrict,
-                    State = user.Address.State,
-                    Number = user.Address.Number,
-                    Complement = user.Address.Complement,
-                    phone = phoneS,
-                    Role = user.Role.Name
+                    var userAll = new GetUserProfileViewModel
+                    {
+                        Name = user.Name,
+                        Email = user.Email,
+                        Cpf = user.Cpf,
+                        street = user.Address.Street,
+                        Disctrict = user.Address.Disctrict,
+                        State = user.Address.State,
+                        Number = user.Address.Number,
+                        Complement = user.Address.Complement,
+                        phone = phoneS,
+                        Role = user.Role.Name
 
-                };
+                    };
+                    return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
+                }
 
-                return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
-            }catch (Exception ex)
+                if(user.Address == null)
+                {
+                    var userAll = new GetUserProfileViewModel
+                    {
+                        Name = user.Name,
+                        Email = user.Email,
+                        Cpf = user.Cpf,
+                        phone = phoneS,
+                        Role = user.Role.Name
+
+                    };
+                    return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
+                }
+
+                if(user.Phones == null)
+                {
+                    var userAll = new GetUserProfileViewModel
+                    {
+                        Name = user.Name,
+                        Email = user.Email,
+                        Cpf = user.Cpf,
+                        street = user.Address.Street,
+                        Disctrict = user.Address.Disctrict,
+                        State = user.Address.State,
+                        Number = user.Address.Number,
+                        Complement = user.Address.Complement,
+                        Role = user.Role.Name
+
+                    };
+                    return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
+                }
+                else
+                {
+                    var userAll = new GetUserProfileViewModel
+                    {
+                        Name = user.Name,
+                        Email = user.Email,
+                        Cpf = user.Cpf,                      
+                        Role = user.Role.Name
+
+                    };
+                    return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
+                }
+
+
+ 
+            }
+            catch (Exception ex)
             {
                 return NotFound(new ResultViewModel<GetUserProfileViewModel>("78650 - Não encontrado"));
             }
-       
+
         }
 
         [Authorize(Roles = "Admin")]
@@ -130,12 +182,80 @@ namespace Capi_Library_Api.Controllers
                     userE.ReturnDate = user.Rental.ReturnDate;
                 }
                 return Ok(new ResultViewModel<GetUserByEmailViewModel>(userE));
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return NotFound(new ResultViewModel<GetUserProfileViewModel>("55650 - Não encontrado"));
-            }     
+            }
         }
 
+        [Authorize(Roles = "Student")]
+        [HttpPut("v1/users/my-profile")]
+        public async Task<IActionResult> UpdateMyProfile([FromServices] DataContext context, [FromBody] UpdateUserViewModel updateUser)
+        {
+            try
+            {
+                var email = HttpContext.User.FindFirst(ClaimTypes.Name).Value;
 
+                var user = await context.Users
+                    .Include(x => x.Address)
+                    .Include(x => x.Phones)
+                    .FirstOrDefaultAsync(x => x.Email == email);
+
+
+                Address adress = new Address
+                {
+                    Street = updateUser.street,
+                    State = updateUser.State,
+                    Disctrict = updateUser.Disctrict,
+                    Number = updateUser.Number,
+                    Complement = updateUser.Complement
+                };
+
+                if(user.Address == null)
+                    user.Address = adress;
+
+                else
+                {
+                    var addressActual = await context.Addresses.FirstOrDefaultAsync(x => x.UserId == user.Id);
+                    addressActual.Street = adress.Street;
+                    addressActual.State = adress.State;
+                    addressActual.Number = adress.Number;
+                    addressActual.Disctrict = adress.Disctrict;
+                    addressActual.Complement = adress.Complement;
+
+                    context.Addresses.Update(addressActual);
+                }
+
+                IList<Phone> phones = new List<Phone>();
+
+                foreach (var phoneNumber in updateUser.PhoneNumber)
+                {
+                    Phone phoneClass = new Phone
+                    {
+                        PhoneNumber = phoneNumber
+                    };
+                    phones.Add(phoneClass);
+                }
+
+                    user.Phones = phones;
+
+
+                user.Name = updateUser.Name;
+                user.Email = updateUser.Email;
+
+                context.Users.Update(user);
+                context.SaveChanges();
+
+                return Ok(new ResultViewModel<UpdateUserViewModel>("Alterado com sucesso"));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<GetUserProfileViewModel>("77750 - Não encontrado"));
+            }
+
+
+
+        }
     }
 }
