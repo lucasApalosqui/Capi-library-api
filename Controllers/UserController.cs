@@ -1,6 +1,7 @@
 ﻿using Capi_Library_Api.Data;
 using Capi_Library_Api.Models;
 using Capi_Library_Api.Services;
+using Capi_Library_Api.Services.UserProfile;
 using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -20,21 +21,13 @@ namespace Capi_Library_Api.Controllers
         {
             try
             {
-                var users = await context.Users
-                    .AsNoTracking()
-                    .Include(x => x.Role)
-                    .Select(x => new GetAllUserViewModel
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Email = x.Email,
-                        Cpf = x.Cpf,
-                        Role = x.Role.Name
-                    })
-                    .OrderBy(x => x.Name)
-                    .ToListAsync();
+                UserProfileService userProfileService = new UserProfileService();
+                List<GetAllUserViewModel> users = await userProfileService.GetUsers(context);
 
-                return Ok(new ResultViewModel<List<GetAllUserViewModel>>(users));
+                if(users == null)
+                    return NotFound(new ResultViewModel<GetAllUserViewModel>("87650 - Usuarios Não encontrados"));
+                else
+                    return Ok(new ResultViewModel<List<GetAllUserViewModel>>(users));
             }
             catch (Exception ex)
             {
@@ -62,7 +55,7 @@ namespace Capi_Library_Api.Controllers
                     phoneS.Add(phone.PhoneNumber);
                 }
 
-                if(user.Address != null && user.Phones != null)
+                if (user.Address != null && user.Phones != null)
                 {
                     var userAll = new GetUserProfileViewModel
                     {
@@ -81,7 +74,7 @@ namespace Capi_Library_Api.Controllers
                     return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
                 }
 
-                if(user.Address == null)
+                if (user.Address == null)
                 {
                     var userAll = new GetUserProfileViewModel
                     {
@@ -95,7 +88,7 @@ namespace Capi_Library_Api.Controllers
                     return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
                 }
 
-                if(user.Phones == null)
+                if (user.Phones == null)
                 {
                     var userAll = new GetUserProfileViewModel
                     {
@@ -118,7 +111,7 @@ namespace Capi_Library_Api.Controllers
                     {
                         Name = user.Name,
                         Email = user.Email,
-                        Cpf = user.Cpf,                      
+                        Cpf = user.Cpf,
                         Role = user.Role.Name
 
                     };
@@ -126,7 +119,7 @@ namespace Capi_Library_Api.Controllers
                 }
 
 
- 
+
             }
             catch (Exception ex)
             {
@@ -212,7 +205,7 @@ namespace Capi_Library_Api.Controllers
                     Complement = updateUser.Complement
                 };
 
-                if(user.Address == null)
+                if (user.Address == null)
                     user.Address = adress;
 
                 else
@@ -238,14 +231,14 @@ namespace Capi_Library_Api.Controllers
                     phones.Add(phoneClass);
                 }
 
-                    user.Phones = phones;
+                user.Phones = phones;
 
 
                 user.Name = updateUser.Name;
                 user.Email = updateUser.Email;
 
                 context.Users.Update(user);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 return Ok(new ResultViewModel<UpdateUserViewModel>("Alterado com sucesso"));
             }
