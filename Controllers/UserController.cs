@@ -54,7 +54,7 @@ namespace Capi_Library_Api.Controllers
 
             }
             catch (Exception ex)
-            {
+            { 
                 return NotFound(new ResultViewModel<GetUserProfileViewModel>("78650 - Não encontrado"));
             }
 
@@ -66,47 +66,14 @@ namespace Capi_Library_Api.Controllers
         {
             try
             {
-                var user = await context.Users
-                .Include(x => x.Address)
-                .Include(x => x.Role)
-                .Include(x => x.Phones)
-                .Include(x => x.Rental)
-                .ThenInclude(x => x.RentalBook)
-                .FirstOrDefaultAsync(x => x.Email == email);
+                UserProfileService userProfileService = new UserProfileService();
 
-                if (user == null)
-                {
-                    return NotFound(new ResultViewModel<GetUserByEmailViewModel>("78650 - Usuário não encontrado"));
-                }
+                var userE = await userProfileService.GetUserByEmail(context, email);
 
-                IList<string> phoneS = new List<string>();
-                foreach (var phone in user.Phones)
-                {
-                    phoneS.Add(phone.PhoneNumber);
-                }
-
-                var userE = new GetUserByEmailViewModel
-                {
-                    Name = user.Name,
-                    Email = user.Email,
-                    Cpf = user.Cpf,
-                    street = user.Address.Street,
-                    Disctrict = user.Address.Disctrict,
-                    State = user.Address.State,
-                    Number = user.Address.Number,
-                    Complement = user.Address.Complement,
-                    phone = phoneS,
-                    Role = user.Role.Name
-                };
-
-                if (user.Rental != null)
-                {
-                    userE.RentalId = user.Rental.Id;
-                    userE.book = user.Rental.RentalBook.Title;
-                    userE.GetDate = user.Rental.GetDate;
-                    userE.ReturnDate = user.Rental.ReturnDate;
-                }
-                return Ok(new ResultViewModel<GetUserByEmailViewModel>(userE));
+                if (userE == null)
+                    return NotFound(new ResultViewModel<GetUserProfileViewModel>("88850 - Não encontrado"));
+                else
+                    return Ok(new ResultViewModel<GetUserByEmailViewModel>(userE));
             }
             catch (Exception ex)
             {

@@ -108,5 +108,49 @@ namespace Capi_Library_Api.Services.UserProfile
                 return userAll;
             }
         }
+
+        public async Task<GetUserByEmailViewModel> GetUserByEmail(DataContext context, string email)
+        {
+            var user = await context.Users
+                .Include(x => x.Address)
+                .Include(x => x.Role)
+                .Include(x => x.Phones)
+                .Include(x => x.Rental)
+                .ThenInclude(x => x.RentalBook)
+                .FirstOrDefaultAsync(x => x.Email == email);
+
+            if (user == null)
+                return null;
+
+            IList<string> phoneS = new List<string>();
+            foreach (var phone in user.Phones)
+            {
+                phoneS.Add(phone.PhoneNumber);
+            }
+
+            var userE = new GetUserByEmailViewModel
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Cpf = user.Cpf,
+                street = user.Address.Street,
+                Disctrict = user.Address.Disctrict,
+                State = user.Address.State,
+                Number = user.Address.Number,
+                Complement = user.Address.Complement,
+                phone = phoneS,
+                Role = user.Role.Name
+            };
+
+            if (user.Rental != null)
+            {
+                userE.RentalId = user.Rental.Id;
+                userE.book = user.Rental.RentalBook.Title;
+                userE.GetDate = user.Rental.GetDate;
+                userE.ReturnDate = user.Rental.ReturnDate;
+            }
+
+            return userE;
+        }
     }
 }

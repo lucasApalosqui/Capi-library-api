@@ -6,7 +6,8 @@ namespace Capi_Library_Api.Services.UserProfile
     public interface IUserProfileService
     {
         public Task<List<GetAllUserViewModel>> GetUsers(DataContext context);
-
         public Task<GetUserProfileViewModel> GetMyProfileUser(DataContext context, string email);
+        public Task<GetUserByEmailViewModel> GetUserByEmail(DataContext context, string email);
+
     }
 }
