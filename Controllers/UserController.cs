@@ -42,82 +42,14 @@ namespace Capi_Library_Api.Controllers
             try
             {
                 var email = HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+                UserProfileService profileService = new UserProfileService();
 
-                var user = await context.Users
-                    .Include(x => x.Address)
-                    .Include(x => x.Role)
-                    .Include(x => x.Phones)
-                    .FirstOrDefaultAsync(x => x.Email == email);
+                var userAll = await profileService.GetMyProfileUser(context, email);
 
-                IList<string> phoneS = new List<string>();
-                foreach (var phone in user.Phones)
-                {
-                    phoneS.Add(phone.PhoneNumber);
-                }
-
-                if (user.Address != null && user.Phones != null)
-                {
-                    var userAll = new GetUserProfileViewModel
-                    {
-                        Name = user.Name,
-                        Email = user.Email,
-                        Cpf = user.Cpf,
-                        street = user.Address.Street,
-                        Disctrict = user.Address.Disctrict,
-                        State = user.Address.State,
-                        Number = user.Address.Number,
-                        Complement = user.Address.Complement,
-                        phone = phoneS,
-                        Role = user.Role.Name
-
-                    };
-                    return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
-                }
-
-                if (user.Address == null)
-                {
-                    var userAll = new GetUserProfileViewModel
-                    {
-                        Name = user.Name,
-                        Email = user.Email,
-                        Cpf = user.Cpf,
-                        phone = phoneS,
-                        Role = user.Role.Name
-
-                    };
-                    return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
-                }
-
-                if (user.Phones == null)
-                {
-                    var userAll = new GetUserProfileViewModel
-                    {
-                        Name = user.Name,
-                        Email = user.Email,
-                        Cpf = user.Cpf,
-                        street = user.Address.Street,
-                        Disctrict = user.Address.Disctrict,
-                        State = user.Address.State,
-                        Number = user.Address.Number,
-                        Complement = user.Address.Complement,
-                        Role = user.Role.Name
-
-                    };
-                    return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
-                }
+                if (userAll == null)
+                    return NotFound(new ResultViewModel<GetUserProfileViewModel>("70050 - Não encontrado"));
                 else
-                {
-                    var userAll = new GetUserProfileViewModel
-                    {
-                        Name = user.Name,
-                        Email = user.Email,
-                        Cpf = user.Cpf,
-                        Role = user.Role.Name
-
-                    };
                     return Ok(new ResultViewModel<GetUserProfileViewModel>(userAll));
-                }
-
 
 
             }

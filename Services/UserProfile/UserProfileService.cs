@@ -1,6 +1,8 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Users;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Capi_Library_Api.Services.UserProfile
 {
@@ -26,6 +28,85 @@ namespace Capi_Library_Api.Services.UserProfile
                 return null;
             else
                 return users;
+        }
+
+        public async Task<GetUserProfileViewModel> GetMyProfileUser(DataContext context, string email)
+        {
+
+            var user = await context.Users
+                    .Include(x => x.Address)
+                    .Include(x => x.Role)
+                    .Include(x => x.Phones)
+                    .FirstOrDefaultAsync(x => x.Email == email);
+
+            IList<string> phoneS = new List<string>();
+            foreach (var phone in user.Phones)
+            {
+                phoneS.Add(phone.PhoneNumber);
+            }
+
+            if (user.Address != null && user.Phones != null)
+            {
+                var userAll = new GetUserProfileViewModel
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Cpf = user.Cpf,
+                    street = user.Address.Street,
+                    Disctrict = user.Address.Disctrict,
+                    State = user.Address.State,
+                    Number = user.Address.Number,
+                    Complement = user.Address.Complement,
+                    phone = phoneS,
+                    Role = user.Role.Name
+
+                };
+                return userAll;
+            }
+
+            if (user.Address == null)
+            {
+                var userAll = new GetUserProfileViewModel
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Cpf = user.Cpf,
+                    phone = phoneS,
+                    Role = user.Role.Name
+
+                };
+                return userAll;
+            }
+
+            if (user.Phones == null)
+            {
+                var userAll = new GetUserProfileViewModel
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Cpf = user.Cpf,
+                    street = user.Address.Street,
+                    Disctrict = user.Address.Disctrict,
+                    State = user.Address.State,
+                    Number = user.Address.Number,
+                    Complement = user.Address.Complement,
+                    Role = user.Role.Name
+
+                };
+                return userAll;
+            }
+            else
+            {
+                var userAll = new GetUserProfileViewModel
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Cpf = user.Cpf,
+                    Role = user.Role.Name
+
+                };
+                return userAll;
+            }
         }
     }
 }
