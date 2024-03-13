@@ -103,5 +103,26 @@ namespace Capi_Library_Api.Controllers
             }
 
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("v1/users/{email}")]
+        public async Task<IActionResult> UpdateUserByEmail([FromServices] DataContext context, [FromBody] UpdateUserViewModel updateUser, [FromRoute] string email)
+        {
+            try
+            {
+
+                UserProfileService profileService = new UserProfileService();
+
+                var userUpdateResponse = await profileService.UpdateUserByEmail(context, email, updateUser);
+
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<UpdateUserViewModel>(userUpdateResponse));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<GetUserProfileViewModel>("77750 - Não encontrado"));
+            }
+        }
     }
 }
