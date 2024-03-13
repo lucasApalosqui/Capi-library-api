@@ -89,64 +89,18 @@ namespace Capi_Library_Api.Controllers
             {
                 var email = HttpContext.User.FindFirst(ClaimTypes.Name).Value;
 
-                var user = await context.Users
-                    .Include(x => x.Address)
-                    .Include(x => x.Phones)
-                    .FirstOrDefaultAsync(x => x.Email == email);
+                UserProfileService profileService = new UserProfileService();
 
+                var userUpdateResponse = await profileService.UpdateUserByEmail(context, email, updateUser);
 
-                Address adress = new Address
-                {
-                    Street = updateUser.street,
-                    State = updateUser.State,
-                    Disctrict = updateUser.Disctrict,
-                    Number = updateUser.Number,
-                    Complement = updateUser.Complement
-                };
-
-                if (user.Address == null)
-                    user.Address = adress;
-
-                else
-                {
-                    var addressActual = await context.Addresses.FirstOrDefaultAsync(x => x.UserId == user.Id);
-                    addressActual.Street = adress.Street;
-                    addressActual.State = adress.State;
-                    addressActual.Number = adress.Number;
-                    addressActual.Disctrict = adress.Disctrict;
-                    addressActual.Complement = adress.Complement;
-
-                    context.Addresses.Update(addressActual);
-                }
-
-                IList<Phone> phones = new List<Phone>();
-
-                foreach (var phoneNumber in updateUser.PhoneNumber)
-                {
-                    Phone phoneClass = new Phone
-                    {
-                        PhoneNumber = phoneNumber
-                    };
-                    phones.Add(phoneClass);
-                }
-
-                user.Phones = phones;
-
-
-                user.Name = updateUser.Name;
-                user.Email = updateUser.Email;
-
-                context.Users.Update(user);
                 await context.SaveChangesAsync();
 
-                return Ok(new ResultViewModel<UpdateUserViewModel>("Alterado com sucesso"));
+                return Ok(new ResultViewModel<UpdateUserViewModel>(userUpdateResponse));
             }
             catch (Exception ex)
             {
                 return NotFound(new ResultViewModel<GetUserProfileViewModel>("77750 - Não encontrado"));
             }
-
-
 
         }
     }

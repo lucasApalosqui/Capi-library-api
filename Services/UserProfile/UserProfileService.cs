@@ -1,4 +1,5 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.Models;
 using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Users;
 using Microsoft.EntityFrameworkCore;
@@ -151,6 +152,77 @@ namespace Capi_Library_Api.Services.UserProfile
             }
 
             return userE;
+        }
+
+        public async Task<UpdateUserViewModel> UpdateUserByEmail(DataContext context, string email, UpdateUserViewModel updateUser)
+        {
+            var user = await context.Users
+                    .Include(x => x.Address)
+                    .Include(x => x.Phones)
+                    .FirstOrDefaultAsync(x => x.Email == email);
+
+            Address adress = new Address
+            {
+                Street = updateUser.street,
+                State = updateUser.State,
+                Disctrict = updateUser.Disctrict,
+                Number = updateUser.Number,
+                Complement = updateUser.Complement
+            };
+
+            if (user.Address == null)
+                user.Address = adress;
+
+            else
+            {
+                var addressActual = await context.Addresses.FirstOrDefaultAsync(x => x.UserId == user.Id);
+                addressActual.Street = adress.Street;
+                addressActual.State = adress.State;
+                addressActual.Number = adress.Number;
+                addressActual.Disctrict = adress.Disctrict;
+                addressActual.Complement = adress.Complement;
+
+                context.Addresses.Update(addressActual);
+            }
+
+            IList<Phone> phones = new List<Phone>();
+
+            foreach (var phoneNumber in updateUser.PhoneNumber)
+            {
+                Phone phoneClass = new Phone
+                {
+                    PhoneNumber = phoneNumber
+                };
+                phones.Add(phoneClass);
+            }
+
+            user.Phones = phones;
+
+            user.Name = updateUser.Name;
+
+            var emailInUseCheck = context.Users.FirstOrDefault(x => x.Email == updateUser.Email);
+
+            if (emailInUseCheck == null)
+                return null;
+            
+            user.Email = updateUser.Email;
+
+            context.Users.Update(user);
+
+            UpdateUserViewModel userUpdateResponse = new UpdateUserViewModel
+            {
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = updateUser.PhoneNumber,
+                street = adress.Street,
+                Disctrict = adress.Disctrict,
+                State = adress.State,
+                Number = adress.Number,
+                Complement = adress.Complement
+
+            };
+
+            return userUpdateResponse;
         }
     }
 }
