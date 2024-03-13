@@ -124,5 +124,6 @@ namespace Capi_Library_Api.Controllers
                 return NotFound(new ResultViewModel<GetUserProfileViewModel>("77750 - Não encontrado"));
             }
         }
+
     }
 }
