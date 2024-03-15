@@ -125,5 +125,26 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("v1/users/{email}")]
+        public async Task<IActionResult> DeleteUserByEmail([FromServices] DataContext context, [FromRoute] string email)
+        {
+            try
+            {
+                var user = await context.Users.FirstOrDefaultAsync(x => x.Email == email);
+                if (user == null)
+                    return NotFound(new ResultViewModel<string>("79750 - Não encontrado"));
+
+                context.Users.Remove(user);
+                context.SaveChanges();
+
+                return Ok(new ResultViewModel<string>("Usuário Removido com Sucesso", new List<string>()));
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<string>("29750 - Não encontrado"));
+            }
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Users;
 
 namespace Capi_Library_Api.Services.UserProfile

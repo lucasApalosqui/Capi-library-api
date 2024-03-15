@@ -54,7 +54,7 @@ namespace Capi_Library_Api.Data.Mappings
             builder.HasOne(x => x.Address)
                 .WithOne(x => x.User)
                 .HasForeignKey<Address>(x => x.UserId)
-                .OnDelete(DeleteBehavior.Restrict)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_User_Address");
 
             builder.HasMany(x => x.Phones)
