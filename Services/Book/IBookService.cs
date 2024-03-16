@@ -5,6 +5,6 @@ namespace Capi_Library_Api.Services.Book
 {
     public interface IBookService
     {
-        public Task<List<GetAllBooksViewModel>> GetAllBooks(DataContext context);
+        public Task<List<GetBooksViewModel>> GetAllBooks(DataContext context);
     }
 }

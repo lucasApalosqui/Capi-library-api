@@ -24,15 +24,19 @@ namespace Capi_Library_Api.Controllers
                 var booksList = await bookService.GetAllBooks(context);
 
                 if (booksList == null)
-                    return NotFound(new ResultViewModel<GetAllUserViewModel>("872750 - Livros Não encontrados"));
+                    return NotFound(new ResultViewModel<GetBooksViewModel>("872750 - Livros Não encontrados"));
 
-                return Ok(new ResultViewModel<List<GetAllBooksViewModel>>(booksList));
+                return Ok(new ResultViewModel<List<GetBooksViewModel>>(booksList));
 
             }
             catch (Exception ex)
             {
-                return NotFound(new ResultViewModel<GetAllUserViewModel>("872250 - Livros Não encontrados"));
+                return NotFound(new ResultViewModel<GetBooksViewModel>("872250 - Livros Não encontrados"));
             }
         }
+
+
+
+
     }
 }

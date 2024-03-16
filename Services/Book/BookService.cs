@@ -6,7 +6,7 @@ namespace Capi_Library_Api.Services.Book
 {
     public class BookService : IBookService
     {
-        public async Task<List<GetAllBooksViewModel>> GetAllBooks(DataContext context)
+        public async Task<List<GetBooksViewModel>> GetAllBooks(DataContext context)
         {
             var booksFromBd = await context.Books
                .Include(x => x.Writers)
@@ -16,11 +16,11 @@ namespace Capi_Library_Api.Services.Book
             if (booksFromBd == null)
                 return null;
 
-            List<GetAllBooksViewModel> booksList = new List<GetAllBooksViewModel>();
+            List<GetBooksViewModel> booksList = new List<GetBooksViewModel>();
 
             foreach (var book in booksFromBd)
             {
-                GetAllBooksViewModel bookView = new GetAllBooksViewModel
+                GetBooksViewModel bookView = new GetBooksViewModel
                 {
                     Title = book.Title,
                     Sinopsis = book.Sinopsis,

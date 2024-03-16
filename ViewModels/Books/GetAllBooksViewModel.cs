@@ -1,6 +1,6 @@
 ﻿namespace Capi_Library_Api.ViewModels.Books
 {
-    public class GetAllBooksViewModel
+    public class GetBooksViewModel
     {
         public string Title { get; set; }
         public string Sinopsis { get; set; }
