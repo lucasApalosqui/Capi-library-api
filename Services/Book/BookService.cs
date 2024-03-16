@@ -8,17 +8,40 @@ namespace Capi_Library_Api.Services.Book
     {
         public async Task<List<GetBooksViewModel>> GetAllBooks(DataContext context)
         {
-            var booksFromBd = await context.Books
+            var booksFromDb = await context.Books
                .Include(x => x.Writers)
                .Include(x => x.Categories)
                .ToListAsync();
 
-            if (booksFromBd == null)
+            if (booksFromDb.Count == 0)
                 return null;
 
+            return GenerateListOfBooks(booksFromDb);
+
+            
+        }
+
+        public async Task<List<GetBooksViewModel>> GetBooksByTitle(DataContext context, string title)
+        {
+            var booksFromDb = await context.Books
+                .AsNoTracking()
+                .Include(x => x.Writers)
+                .Include(x => x.Categories)
+                .Where(x => x.Title.Contains(title))
+                .ToListAsync();
+
+            if (booksFromDb.Count == 0)
+                return null;
+
+            return GenerateListOfBooks(booksFromDb);
+
+        }
+
+        private List<GetBooksViewModel> GenerateListOfBooks(List<Models.Book> books)
+        {
             List<GetBooksViewModel> booksList = new List<GetBooksViewModel>();
 
-            foreach (var book in booksFromBd)
+            foreach (var book in books)
             {
                 GetBooksViewModel bookView = new GetBooksViewModel
                 {
@@ -39,7 +62,7 @@ namespace Capi_Library_Api.Services.Book
                 }
 
                 booksList.Add(bookView);
- 
+
             }
             return booksList;
         }
