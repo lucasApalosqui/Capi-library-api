@@ -57,6 +57,28 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("v1/books/author/{author}")]
+        public async Task<IActionResult> GetBooksByAuthor([FromServices] DataContext context, [FromRoute] string author)
+        {
+            try
+            {
+                BookService bookService = new BookService();
+                var bookListByAuthor = await bookService.GetBooksByAuthor(context, author);
+
+                if (bookListByAuthor == null)
+                    return NotFound(new ResultViewModel<GetBooksViewModel>("87UI50 - Livros Não encontrados"));
+
+                return Ok(new ResultViewModel<List<GetBooksViewModel>>(bookListByAuthor));
+
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<GetBooksViewModel>("878P50 - Livros Não encontrados"));
+            }
+        }
+
 
     }
 }

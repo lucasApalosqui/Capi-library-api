@@ -37,6 +37,27 @@ namespace Capi_Library_Api.Services.Book
 
         }
 
+        public async Task<List<GetBooksViewModel>> GetBooksByAuthor(DataContext context, string author)
+        {
+            var WriterFromDb = await context.Writers
+                .FirstOrDefaultAsync(x => x.Name == author);
+
+            if (WriterFromDb == null)
+                return null;
+
+            var booksFromDb = await context.Books
+                .Include(x => x.Writers)
+                .Include(x => x.Categories)
+                .Where(x => x.Writers.Contains(WriterFromDb))
+                .ToListAsync();
+
+            if (booksFromDb.Count == 0)
+                return null;
+
+            return GenerateListOfBooks(booksFromDb);
+
+        }
+
         private List<GetBooksViewModel> GenerateListOfBooks(List<Models.Book> books)
         {
             List<GetBooksViewModel> booksList = new List<GetBooksViewModel>();
