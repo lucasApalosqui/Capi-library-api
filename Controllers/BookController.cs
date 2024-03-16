@@ -101,6 +101,26 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost("v1/books")]
+        public async Task<IActionResult> CreateBook([FromServices] DataContext context, [FromBody] CreateBookViewModel book)
+        {
+            try
+            {
+                BookService bookService = new BookService();
+                var bookCreatedResponse = await bookService.CreateBook(context, book);
+
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<CreateBookViewModel>(bookCreatedResponse));
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<GetBooksViewModel>("87MP50 - Erro ao criar"));
+            }
+        }
+
 
     }
 }

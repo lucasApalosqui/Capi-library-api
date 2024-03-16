@@ -1,4 +1,5 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.Models;
 using Capi_Library_Api.ViewModels.Books;
 using Microsoft.EntityFrameworkCore;
 
@@ -76,6 +77,78 @@ namespace Capi_Library_Api.Services.Book
                 return null;
 
             return GenerateListOfBooks(booksFromDb);
+        }
+
+        public async Task<CreateBookViewModel> CreateBook(DataContext context, CreateBookViewModel bookInfo)
+        {
+            var book = new Models.Book
+            {
+                Title = bookInfo.Title,
+                Sinopsis = bookInfo.Sinopsis,
+                Pages = bookInfo.Pages,
+                GeneralAud = bookInfo.GeneralAud,
+                Categories = new List<Category>(),
+                Writers = new List<Writer>()
+            };
+
+            foreach(var author in bookInfo.authors)
+            {
+                var authorVerify = await context.Writers.FirstOrDefaultAsync(x => x.Name == author);
+                if(authorVerify == null)
+                {
+                    var newAuthor = new Writer
+                    {
+                        Name = author
+                    };
+                    context.Writers.Add(newAuthor);
+                    book.Writers.Add(newAuthor);
+                    
+
+                }
+                else
+                {
+                    book.Writers.Add(authorVerify);
+                }
+
+            }
+
+            foreach (var category in bookInfo.categories)
+            {
+                var categoryVerify = await context.Categories.FirstOrDefaultAsync(x => x.Name == category);
+                if (categoryVerify == null)
+                {
+                    var newCategory = new Category
+                    {
+                        Name = category
+                    };
+                    context.Categories.Add(newCategory);
+                    book.Categories.Add(newCategory);
+                       
+                }
+                else
+                {
+                    book.Categories.Add(categoryVerify);
+                }
+
+            }
+
+            context.Books.Add(book);
+            
+
+            CreateBookViewModel newBookView = new CreateBookViewModel
+            {
+                Title = book.Title,
+                Sinopsis = book.Sinopsis,
+                Pages = book.Pages,
+                GeneralAud = book.GeneralAud,
+                categories = bookInfo.categories,
+                authors = bookInfo.authors
+            };
+
+
+            return newBookView;
+
+
         }
 
         private List<GetBooksViewModel> GenerateListOfBooks(List<Models.Book> books)
