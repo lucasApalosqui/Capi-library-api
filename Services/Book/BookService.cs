@@ -133,6 +133,23 @@ namespace Capi_Library_Api.Services.Book
 
         }
 
+        public async Task<UpdateBookViewModel> UpdateBook(DataContext context, UpdateBookViewModel bookUpdate)
+        {
+            var book = await context.Books.FirstOrDefaultAsync(x => x.Id == bookUpdate.Id);
+
+            if (book == null)
+                return null;
+
+            book.Title = bookUpdate.Title;
+            book.Sinopsis = bookUpdate.Sinopsis;
+            book.Pages = bookUpdate.Pages;
+            book.GeneralAud = bookUpdate.GeneralAud;
+
+            context.Books.Update(book);
+
+            return bookUpdate;
+        }
+
         private List<GetBooksViewModel> GenerateListOfBooks(List<Models.Book> books)
         {
             List<GetBooksViewModel> booksList = new List<GetBooksViewModel>();

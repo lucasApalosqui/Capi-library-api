@@ -124,6 +124,29 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("v1/books")]
+        public async Task<IActionResult> UpdateBook([FromServices] DataContext context, [FromBody] UpdateBookViewModel updateBook)
+        {
+            try
+            {
+                BookService bookService = new BookService();
+
+                var bookUpdateResponse = await bookService.UpdateBook(context, updateBook);
+                if(bookUpdateResponse == null)
+                    return NotFound(new ResultViewModel<UpdateBookViewModel>("8RRR50 - livro não encontrado"));
+
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<UpdateBookViewModel>(bookUpdateResponse));
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<UpdateBookViewModel>("87MPTT - Erro ao atualizar"));
+            }
+        }
+
 
     }
 }
