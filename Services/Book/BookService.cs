@@ -94,18 +94,7 @@ namespace Capi_Library_Api.Services.Book
             foreach(var author in bookInfo.authors)
             {
                 var authorVerify = await context.Writers.FirstOrDefaultAsync(x => x.Name == author);
-                if(authorVerify == null)
-                {
-                    var newAuthor = new Writer
-                    {
-                        Name = author
-                    };
-                    context.Writers.Add(newAuthor);
-                    book.Writers.Add(newAuthor);
-                    
-
-                }
-                else
+                if(authorVerify != null)
                 {
                     book.Writers.Add(authorVerify);
                 }
@@ -115,25 +104,18 @@ namespace Capi_Library_Api.Services.Book
             foreach (var category in bookInfo.categories)
             {
                 var categoryVerify = await context.Categories.FirstOrDefaultAsync(x => x.Name == category);
-                if (categoryVerify == null)
-                {
-                    var newCategory = new Category
-                    {
-                        Name = category
-                    };
-                    context.Categories.Add(newCategory);
-                    book.Categories.Add(newCategory);
-                       
-                }
-                else
+                if(categoryVerify != null) 
                 {
                     book.Categories.Add(categoryVerify);
                 }
 
             }
 
-            context.Books.Add(book);
-            
+            if (book.Categories.Count == 0 || book.Writers.Count == 0)
+                return null;
+
+                context.Books.Add(book);
+
 
             CreateBookViewModel newBookView = new CreateBookViewModel
             {

@@ -110,6 +110,9 @@ namespace Capi_Library_Api.Controllers
                 BookService bookService = new BookService();
                 var bookCreatedResponse = await bookService.CreateBook(context, book);
 
+                if(bookCreatedResponse == null)
+                    return NotFound(new ResultViewModel<GetBooksViewModel>("87YP50 - Autores e Categorias nao podem estar vazios!"));
+
                 await context.SaveChangesAsync();
 
                 return Ok(new ResultViewModel<CreateBookViewModel>(bookCreatedResponse));
