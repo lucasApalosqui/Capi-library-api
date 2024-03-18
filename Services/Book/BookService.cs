@@ -87,7 +87,7 @@ namespace Capi_Library_Api.Services.Book
                 Sinopsis = bookInfo.Sinopsis,
                 Pages = bookInfo.Pages,
                 GeneralAud = bookInfo.GeneralAud,
-                Categories = new List<Category>(),
+                Categories = new List<Models.Category>(),
                 Writers = new List<Writer>()
             };
 
