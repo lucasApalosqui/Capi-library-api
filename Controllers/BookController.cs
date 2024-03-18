@@ -147,6 +147,35 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("v1/books/add-category")]
+        public async Task<IActionResult> AddCategoryToBook([FromServices] DataContext context, [FromBody]  AddCategoryToBookViewModel categoryToBook)
+        {
+            try
+            {
+                foreach (var category in categoryToBook.Categories)
+                {
+                    var categoryVerify = await context.Categories.FirstOrDefaultAsync(x => x.Name == category);
+                    if (categoryVerify == null)
+                        return NotFound(new ResultViewModel<AddCategoryToBookViewModel>("85JPTT - Uma ou mais categorias não cadastradas"));
+                }
+
+                BookService bookService = new BookService();
+                var addCategoryToBookResponse = await bookService.AddCategoryToBook(context, categoryToBook);
+
+                if (addCategoryToBookResponse == null)
+                    return NotFound(new ResultViewModel<AddCategoryToBookViewModel>("905JPTT - Livro não encontrado"));
+
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<AddCategoryToBookViewModel>(addCategoryToBookResponse));
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<AddCategoryToBookViewModel>("87JPTT - Erro ao adicionar categoria"));
+            }
+        }
 
     }
 }

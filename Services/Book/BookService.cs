@@ -150,6 +150,28 @@ namespace Capi_Library_Api.Services.Book
             return bookUpdate;
         }
 
+        public async Task<AddCategoryToBookViewModel> AddCategoryToBook(DataContext context, AddCategoryToBookViewModel categoryToBook)
+        {
+            var book = await context.Books
+                .Include(x => x.Categories)
+                .FirstOrDefaultAsync(x => x.Id == categoryToBook.BookId);
+
+            if (book == null)
+                return null;
+
+            foreach(var category in categoryToBook.Categories)
+            {
+                var categoryVerify = await context.Categories.FirstOrDefaultAsync(x => x.Name == category);
+                if (categoryVerify != null)
+                    book.Categories.Add(categoryVerify);
+            }
+
+            context.Books.Update(book);
+
+            return categoryToBook;
+            
+        }
+
         private List<GetBooksViewModel> GenerateListOfBooks(List<Models.Book> books)
         {
             List<GetBooksViewModel> booksList = new List<GetBooksViewModel>();
