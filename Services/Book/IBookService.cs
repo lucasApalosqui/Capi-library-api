@@ -13,6 +13,7 @@ namespace Capi_Library_Api.Services.Book
         public Task<CreateBookViewModel> CreateBook(DataContext context, CreateBookViewModel bookInfo);
         public Task<UpdateBookViewModel> UpdateBook(DataContext context, UpdateBookViewModel bookUpdate);
         public Task<AddCategoryToBookViewModel> AddCategoryToBook(DataContext context, AddCategoryToBookViewModel categorieToBook);
-        
+        public Task<AddAuthorToBookViewModel> AddAuthorToBook(DataContext context, AddAuthorToBookViewModel authorToBook);
+
     }
 }

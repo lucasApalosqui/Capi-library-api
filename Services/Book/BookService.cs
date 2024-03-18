@@ -172,6 +172,27 @@ namespace Capi_Library_Api.Services.Book
             
         }
 
+        public async Task<AddAuthorToBookViewModel> AddAuthorToBook(DataContext context, AddAuthorToBookViewModel authorToBook)
+        {
+            var book = await context.Books
+                .Include(x => x.Writers)
+                .FirstOrDefaultAsync(x => x.Id == authorToBook.BookId);
+
+            if (book == null)
+                return null;
+
+            foreach (var author in authorToBook.Authors)
+            {
+                var authorVerify = await context.Writers.FirstOrDefaultAsync(x => x.Name == author);
+                if (authorVerify != null)
+                    book.Writers.Add(authorVerify);
+            }
+
+            context.Books.Update(book);
+
+            return authorToBook;
+        }
+
         private List<GetBooksViewModel> GenerateListOfBooks(List<Models.Book> books)
         {
             List<GetBooksViewModel> booksList = new List<GetBooksViewModel>();

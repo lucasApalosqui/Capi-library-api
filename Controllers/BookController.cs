@@ -177,5 +177,35 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("v1/books/add-author")]
+        public async Task<IActionResult> AddAuthorToBook([FromServices] DataContext context, [FromBody] AddAuthorToBookViewModel authorToBook)
+        {
+            try
+            {
+                foreach (var author in authorToBook.Authors)
+                {
+                    var authorVerify = await context.Writers.FirstOrDefaultAsync(x => x.Name == author);
+                    if (authorVerify == null)
+                        return NotFound(new ResultViewModel<AddAuthorToBookViewModel>("85TTTT - Uma ou mais Autores não cadastrados"));
+                }
+
+                BookService bookService = new BookService();
+                var addAuthorToBookResponse = await bookService.AddAuthorToBook(context, authorToBook);
+
+                if (addAuthorToBookResponse == null)
+                    return NotFound(new ResultViewModel<AddAuthorToBookViewModel>("902JPTT - Livro não encontrado"));
+
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<AddAuthorToBookViewModel>(addAuthorToBookResponse));
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<AddAuthorToBookViewModel>("87JPTT - Erro ao adicionar autor"));
+            }
+        }
+
     }
 }
