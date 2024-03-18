@@ -207,5 +207,27 @@ namespace Capi_Library_Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("v1/books/remove/{id}")]
+        public async Task<IActionResult> RemoveBookById([FromServices] DataContext context, [FromRoute] int id)
+        {
+            try
+            {
+                var bookToRemove = await context.Books.FirstOrDefaultAsync(x => x.Id == id);
+                if (bookToRemove == null)
+                    return NotFound(new ResultViewModel<Book>("345PLK - Livro Não Encontrado"));
+
+                context.Books.Remove(bookToRemove);
+                context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<Book>("Livro Removido com Sucesso!"));
+
+
+            }catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<Book>("345HJK - Não foi possivel remover o livro"));
+            }
+        }
+
     }
 }
