@@ -75,5 +75,33 @@ namespace Capi_Library_Api.Controllers
                 return NotFound(new ResultViewModel<CategoriesWithIdViewModel>("898UPR - Erro ao encontrar categorias"));
             }
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("v1/categories")]
+        public async Task<IActionResult> UpdateCategory([FromServices] DataContext context, [FromBody] CategoriesWithIdViewModel category)
+        {
+            try
+            {
+                var categoryExistsVerify = await context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Name == category.Name);
+
+                if (categoryExistsVerify != null)
+                    return NotFound(new ResultViewModel<CategoriesWithIdViewModel>("5462LL - Categoria já cadastrada"));
+
+                CategoryService categoryService = new CategoryService();
+                var UpdateCategoryResponse = await categoryService.UpdateCategory(context, category);
+
+                if (UpdateCategoryResponse == null)
+                    return NotFound(new ResultViewModel<CategoriesWithIdViewModel>("5552I - Categoria não existe"));
+
+                return Ok(new ResultViewModel<CategoriesWithIdViewModel>(UpdateCategoryResponse));
+            }
+            catch (Exception e)
+            {
+
+                return NotFound(new ResultViewModel<CategoriesWithIdViewModel>("12334H - Não foi possivel atualizar a categoria"));
+            }
+        }
+
+
     }
 }

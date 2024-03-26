@@ -64,5 +64,19 @@ namespace Capi_Library_Api.Services.Category
 
             return CategoriesToSeeWithId;
         }
+
+        public async Task<CategoriesWithIdViewModel> UpdateCategory(DataContext context, CategoriesWithIdViewModel category)
+        {
+            var categoryToUpdate = await context.Categories.FirstOrDefaultAsync(x => x.Id == category.Id);
+            if (categoryToUpdate == null)
+                return null;
+
+            categoryToUpdate.Name = category.Name;
+
+            context.Categories.Update(categoryToUpdate);
+            await context.SaveChangesAsync();
+
+            return category;
+        }
     }
 }
