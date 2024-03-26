@@ -7,5 +7,6 @@ namespace Capi_Library_Api.Services.Category
     {
         public Task<List<SeeCategoryViewModel>> GetAllCategories(DataContext context);
         public Task<CreateCategoryViewModel> CreateCategory(DataContext context, CreateCategoryViewModel model);
+        public Task<List<CategoriesWithIdViewModel>> GetAllCategoriesWithId(DataContext context);
     }
 }

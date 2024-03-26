@@ -42,5 +42,27 @@ namespace Capi_Library_Api.Services.Category
             return model;
 
         }
+
+        public async Task<List<CategoriesWithIdViewModel>> GetAllCategoriesWithId(DataContext context)
+        {
+            var allCategories = await context.Categories.AsNoTracking().ToListAsync();
+
+            if (allCategories.Count == 0)
+                return null;
+
+            var CategoriesToSeeWithId = new List<CategoriesWithIdViewModel>();
+            foreach (var category in allCategories)
+            {
+                var categoryToAdd = new CategoriesWithIdViewModel()
+                {
+                    Name = category.Name,
+                    Id = category.Id
+                };
+
+                CategoriesToSeeWithId.Add(categoryToAdd);
+            }
+
+            return CategoriesToSeeWithId;
+        }
     }
 }

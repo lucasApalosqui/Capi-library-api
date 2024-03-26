@@ -54,5 +54,26 @@ namespace Capi_Library_Api.Controllers
                 return NotFound(new ResultViewModel<CreateCategoryViewModel>("456JJH - Erro ao criar categoria"));
             }
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("v1/categories/id-list")]
+        public async Task<IActionResult> GetAllCategoriesWithId([FromServices] DataContext context)
+        {
+            try
+            {
+                CategoryService categoryService = new CategoryService();
+                var GetAllCategoryWithIdResponse = await categoryService.GetAllCategoriesWithId(context);
+
+                if (GetAllCategoryWithIdResponse == null)
+                    return NotFound(new ResultViewModel<CategoriesWithIdViewModel>("8955LR - Categorias não encontradas"));
+
+                return Ok(new ResultViewModel<List<CategoriesWithIdViewModel>>(GetAllCategoryWithIdResponse));
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ResultViewModel<CategoriesWithIdViewModel>("898UPR - Erro ao encontrar categorias"));
+            }
+        }
     }
 }
