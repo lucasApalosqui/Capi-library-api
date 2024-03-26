@@ -4,6 +4,7 @@ using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Categories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Capi_Library_Api.Controllers
 {
@@ -27,6 +28,30 @@ namespace Capi_Library_Api.Controllers
             }catch (Exception ex)
             {
                 return NotFound(new ResultViewModel<SeeCategoryViewModel>("897UPR - Erro ao encontrar categorias"));
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("v1/categories")]
+        public async Task<IActionResult> CreateCategory([FromServices] DataContext context, [FromBody] CreateCategoryViewModel category)
+        {
+            try
+            {
+                var categoryVerify = await context.Categories.FirstOrDefaultAsync(x => x.Name == category.Name);
+
+                if (categoryVerify != null)
+                    return NotFound(new ResultViewModel<CreateCategoryViewModel>("456PL - Categoria já cadastrada"));
+
+                CategoryService categoryService = new CategoryService();
+                var categoryCreateResponse = await categoryService.CreateCategory(context, category);
+
+
+                return Ok(new ResultViewModel<CreateCategoryViewModel>(categoryCreateResponse));
+            }
+            catch (Exception e)
+            {
+
+                return NotFound(new ResultViewModel<CreateCategoryViewModel>("456JJH - Erro ao criar categoria"));
             }
         }
     }

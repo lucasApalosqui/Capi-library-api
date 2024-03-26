@@ -1,4 +1,5 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.Models;
 using Capi_Library_Api.ViewModels.Categories;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,20 @@ namespace Capi_Library_Api.Services.Category
 
             return CategoriesToSee;
             
+        }
+
+        public async Task<CreateCategoryViewModel> CreateCategory(DataContext context, CreateCategoryViewModel model)
+        {
+            Models.Category categoryToCreate = new Models.Category
+            {
+                Name = model.Name
+            };
+
+            await context.Categories.AddAsync(categoryToCreate);
+            await context.SaveChangesAsync();
+
+            return model;
+
         }
     }
 }
