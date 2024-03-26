@@ -1,4 +1,5 @@
 ﻿using Capi_Library_Api.Data;
+using Capi_Library_Api.Models;
 using Capi_Library_Api.Services.Category;
 using Capi_Library_Api.ViewModels;
 using Capi_Library_Api.ViewModels.Categories;
@@ -99,6 +100,27 @@ namespace Capi_Library_Api.Controllers
             {
 
                 return NotFound(new ResultViewModel<CategoriesWithIdViewModel>("12334H - Não foi possivel atualizar a categoria"));
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("v1/categories/remove/{id}")]
+        public async Task<IActionResult> RemoveCategory([FromServices] DataContext context, [FromRoute] int id)
+        {
+            try
+            {
+                var categoryToRemove = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+                if (categoryToRemove == null)
+                    return NotFound(new ResultViewModel<Category>("676GGH - Categoria Não encontrada"));
+                context.Categories.Remove(categoryToRemove);
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<string>("Categoria Removida com sucesso", new List<string>()));
+            }
+            catch (Exception e)
+            {
+
+                return NotFound(new ResultViewModel<Category>("676KGH Não foi possivel remover a categoria"));
             }
         }
 
